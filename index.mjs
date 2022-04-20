@@ -30,9 +30,17 @@ const OUTCOME = ["Bob wins", "Draw", "Alice wins"];
 const Player = (Who) => ({
   ...stdlib.hasRandom,
   // gets the hand the participant has decided to show
-  getHand: () => {
+  getHand: async () => {
     const hand = Math.floor(Math.random() * 3);
     console.log(`${Who} played ${HAND[hand]}`);
+    // delay in showing hand. This is just for the 
+    // pupose of testing Reach Timeout function
+    if ( Math.random() <= 0.01 ) {
+      for ( let i = 0; i < 10; i++ ) {
+        console.log(`  ${Who} takes their sweet time sending it back...`);
+        await stdlib.wait(1);
+      }
+    }
     return hand;
   },
 
@@ -56,18 +64,11 @@ await Promise.all([
   ctcBob.p.Bob({
     ...Player("Bob"),
 
-    // bob accepts the wager if he doesn't delay
-    acceptWager: async (amt) => {
-      // <-- async now
-      if (Math.random() <= 0.5) {
-        for (let i = 0; i < 10; i++) {
-          console.log(`  Bob takes his sweet time...`);
-          await stdlib.wait(1);
-        }
-      } else {
-        console.log(`Bob accepts the wager of ${fmt(amt)}.`);
-      }
+    // bob accepts the wager 
+    acceptWager: (amt) => {
+      console.log(`Bob accepts the wager of ${fmt(amt)}.`);
     },
+
   }),
 ]);
 
