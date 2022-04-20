@@ -55,6 +55,8 @@ await Promise.all([
   }),
   ctcBob.p.Bob({
     ...Player("Bob"),
+
+    // bob accepts the wager if he doesn't delay
     acceptWager: async (amt) => {
       // <-- async now
       if (Math.random() <= 0.5) {

@@ -39,6 +39,7 @@ export const main = Reach.App(() => {
   });
   init();
 
+  // function to notify about time out
   const informTimeout = () => {
     each([Alice, Bob], () => {
       interact.informTimeout();
@@ -67,6 +68,7 @@ export const main = Reach.App(() => {
     const handBob = declassify(interact.getHand());
   });
 
+  // make public and invokes time out
   Bob.publish(handBob)
     .pay(wager)
     .timeout(relativeTime(deadline), () => closeTo(Alice, informTimeout));
@@ -78,7 +80,7 @@ export const main = Reach.App(() => {
     const handAlice = declassify(_handAlice);
   });
 
-  // make it public
+  // make it public and invokes time out
   Alice.publish(saltAlice, handAlice).timeout(relativeTime(deadline), () =>
     closeTo(Bob, informTimeout)
   );
