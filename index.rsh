@@ -24,18 +24,26 @@ const Player = {
   ...hasRandom, // <--- new!
   getHand: Fun([], UInt),
   seeOutcome: Fun([UInt], Null),
+  informTimeout: Fun([], Null),
 };
 
 export const main = Reach.App(() => {
   const Alice = Participant("Alice", {
     ...Player,
     wager: UInt,
+    deadline: UInt,
   });
   const Bob = Participant("Bob", {
     ...Player,
     acceptWager: Fun([UInt], Null),
   });
   init();
+
+  const informTimeout = () => {
+    each([Alice, Bob], () => {
+      interact.informTimeout();
+    });
+  };
 
   Alice.only(() => {
     const wager = declassify(interact.wager);
@@ -46,8 +54,9 @@ export const main = Reach.App(() => {
     // gives a password to be used in opening the hand when it is time
     const [_commitAlice, _saltAlice] = makeCommitment(interact, _handAlice);
     const commitAlice = declassify(_commitAlice);
+    const deadline = declassify(interact.deadline);
   });
-  Alice.publish(wager, commitAlice).pay(wager);
+  Alice.publish(wager, commitAlice, deadline).pay(wager);
   commit();
 
   // telling the program that Bob cannot know Alice details
@@ -58,7 +67,9 @@ export const main = Reach.App(() => {
     const handBob = declassify(interact.getHand());
   });
 
-  Bob.publish(handBob).pay(wager);
+  Bob.publish(handBob)
+    .pay(wager)
+    .timeout(relativeTime(deadline), () => closeTo(Alice, informTimeout));
   commit();
 
   // time to reavel password and hand
@@ -68,7 +79,9 @@ export const main = Reach.App(() => {
   });
 
   // make it public
-  Alice.publish(saltAlice, handAlice);
+  Alice.publish(saltAlice, handAlice).timeout(relativeTime(deadline), () =>
+    closeTo(Bob, informTimeout)
+  );
 
   // check if the details here matches what was created with makeCommitment
   checkCommitment(commitAlice, saltAlice, handAlice);
