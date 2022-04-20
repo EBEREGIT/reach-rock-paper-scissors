@@ -110,7 +110,7 @@ interact.getHand = async () => {
   return hand;
 };
 
-
+// setup the out come here
 const OUTCOME = ['Bob wins', 'Draw', 'Alice wins'];
 interact.seeOutcome = async (outcome) => {
   console.log(`The outcome is: ${OUTCOME[outcome]}`);
