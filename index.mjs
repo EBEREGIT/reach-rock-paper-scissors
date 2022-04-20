@@ -28,6 +28,7 @@ const OUTCOME = ["Bob wins", "Draw", "Alice wins"];
 // Player function definition
 // contains things that the participants can do
 const Player = (Who) => ({
+  ...stdlib.hasRandom,
   // gets the hand the participant has decided to show
   getHand: () => {
     const hand = Math.floor(Math.random() * 3);
